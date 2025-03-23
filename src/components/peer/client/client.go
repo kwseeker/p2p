@@ -87,9 +87,7 @@ func (c *Client) run(toCid *string, toAuthCode *string) {
     c.toAuthCode = toAuthCode
 
     // 1 连接信令服务器并上报本端信息
-    if err := c.connectSignalServer(); err != nil {
-        return
-    }
+    c.connectSignalServer()
 
     // 2 连接ICE服务器
     config := webrtc.Configuration{
@@ -152,20 +150,18 @@ func (c *Client) run(toCid *string, toAuthCode *string) {
     c.listenForShutdown()
 }
 
-func (c *Client) connectSignalServer() error {
+func (c *Client) connectSignalServer() {
     u := url.URL{Scheme: "ws", Host: c.signalServerConfig.SignalServerAddr, Path: c.signalServerConfig.SignalServerPath}
     log.Printf("connecting to signal server %s", u.String())
     var err error
     if c.signalConn, _, err = websocket.DefaultDialer.Dial(u.String(), nil); err != nil {
-        log.Printf("connecting to signal server, err: %v\n", err)
-        return err
+        log.Fatalf("connecting to signal server, err: %v\n", err)
     }
 
     // 上报本端信息到信令服务器
     if err := c.signalConn.WriteJSON(message.NewRegisterRequest(c.cid, c.authCode)); err != nil {
-        log.Printf("register local peer info to signal server, err: %v\n", err)
         c.signalConn.Close()
-        return err
+        log.Fatalf("register local peer info to signal server, err: %v\n", err)
     }
     log.Printf("register peer info to signal server, cid=%s, authCode=%s", c.cid, c.authCode)
 
@@ -266,8 +262,6 @@ func (c *Client) connectSignalServer() error {
             }
         }
     }()
-
-    return nil
 }
 
 // OnICECandidate 处理ICE返回候选地址事件

@@ -141,16 +141,16 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 
     for {
         // 读取客户端发送的消息
-        messageType, message, err := conn.ReadMessage()
+        messageType, m, err := conn.ReadMessage()
         if err != nil {
             log.Println("Read error:", err)
             break
         }
 
-        log.Printf("Received: %s", message)
+        log.Printf("Received: %s", m)
 
         // 将消息原样返回给客户端
-        if err := conn.WriteMessage(messageType, message); err != nil {
+        if err := conn.WriteMessage(messageType, m); err != nil {
             log.Println("Write error:", err)
             break
         }

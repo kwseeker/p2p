@@ -1,0 +1,41 @@
+version: '3.8'
+# docker-compose -f docker-compose.yml up -d
+services:
+
+  # signal-server在主机上运行，容器默认是可以通过主机IP访问主机上的服务的
+
+  peer-answer:
+    image: peer_answer:0.0.1
+    container_name: peer-answer
+    environment:
+      - SSA=192.168.8.100:18900
+      - ISA=stun:192.168.8.100:3478
+    networks:
+      - p2p-net1
+
+  peer-offer:
+    image: peer_offer:0.0.1
+    container_name: peer-offer
+    environment:
+      - SSA=192.168.8.100:18900
+      - ISA=stun:192.168.8.100:3478
+    networks:
+      - p2p-net2
+    depends_on:
+      - peer-answer
+
+# 查看所有Docker子网
+# docker network inspect $(docker network ls -q) --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}'
+networks:
+  p2p-net1:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24  # 子网
+          gateway: 172.25.0.1    # 网关
+  p2p-net2:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.26.0.0/24  # 子网
+          gateway: 172.26.0.1    # 网关

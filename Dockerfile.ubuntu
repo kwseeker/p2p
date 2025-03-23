@@ -1,0 +1,16 @@
+# 构建一个网络工具齐全的Ubuntu镜像，用于测试Docker虚拟网络是否可用于模拟公网和局域网环境
+FROM ubuntu:latest
+
+# 更新包列表并安装网络工具
+RUN apt-get update && apt-get install -y \
+    iputils-ping \
+    net-tools \
+    dnsutils \
+    curl \
+    wget \
+    telnet \
+    tcpdump \
+    traceroute \
+    iproute2 \
+    nmap \
+    && rm -rf /var/lib/apt/lists/* \
