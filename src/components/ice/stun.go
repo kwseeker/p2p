@@ -1,10 +1,9 @@
-package ice
+package main
 
 import (
     "errors"
     "net"
     "os"
-    "testing"
     "time"
 
     "github.com/pion/logging"
@@ -15,23 +14,19 @@ import (
 
 var log = logging.NewDefaultLeveledLoggerForScope("", logging.LogLevelDebug, os.Stdout)
 
-func TestStunNatInfo(t *testing.T) {
-    tests := []struct {
-        name          string
-        stunServerUrl string
-    }{
-        {"stun_google", "stun.l.google.com:19302"},
+func main() {
+    addr := []string{
+        "stun.l.google.com:19302",
+        "192.168.8.100:3478",
     }
 
-    for _, test := range tests {
-        t.Run(test.name, func(t *testing.T) {
-            if err := mappingTests(test.stunServerUrl); err != nil {
-                t.Log("NAT mapping behavior: inconclusive")
-            }
-            if err := filteringTests(test.stunServerUrl); err != nil {
-                t.Log("NAT filtering behavior: inconclusive")
-            }
-        })
+    for _, a := range addr {
+        if err := mappingTests(a); err != nil {
+            log.Errorf("Error: %s\n", err)
+        }
+        //if err := filteringTests(a); err != nil {
+        //    log.Errorf("Error: %s\n", err)
+        //}
     }
 }
 

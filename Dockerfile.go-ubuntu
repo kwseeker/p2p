@@ -1,5 +1,15 @@
 # 构建一个网络工具齐全的Ubuntu镜像，用于测试Docker虚拟网络是否可用于模拟公网和局域网环境
-FROM ubuntu:latest
+# docker build -f Dockerfile.go-ubuntu --tag golang:1.21.3-ubuntu22.04 .
+# docker run -it --rm golang:1.21.3-ubuntu22.04
+# go version
+FROM ubuntu:22.04
+
+ADD https://go.dev/dl/go1.21.3.linux-amd64.tar.gz /tmp
+
+RUN tar -C /usr/local -xzf /tmp/go1.21.3.linux-amd64.tar.gz \
+    && rm /tmp/go1.21.3.linux-amd64.tar.gz
+
+ENV PATH=/usr/local/go/bin:$PATH
 
 # 更新包列表并安装网络工具
 RUN apt-get update && apt-get install -y \
